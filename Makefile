@@ -15,9 +15,9 @@ run:
 
 clean:
 ifeq ($(OS),Windows_NT)
-	rm -Recurse -Force ./bin
+	-del .\bin
 else
-	rm -rf ./bin || true
+	rm -rf ./bin
 endif
 	
 
