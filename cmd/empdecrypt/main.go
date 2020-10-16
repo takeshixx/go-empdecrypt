@@ -43,6 +43,9 @@ func decryptPassword(hash string) (password string) {
 			cur = password + string(rune(c))
 			encrypted, err := executor.ExecuteEmpCrypt(cur)
 			if err != nil {
+				if verbose {
+					fmt.Printf("Exec failed: %v\n", err)
+				}
 				return
 			}
 			if encrypted[sequence[i]] == hash[sequence[i]] {

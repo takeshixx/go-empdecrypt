@@ -1,30 +1,31 @@
-// +build embedded
-
 package embedded
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/markbates/pkger"
 )
 
+var loadedExe bool
+var execPath string
+
 func ExecResource(resource string, args []string) (encrypted []byte, err error) {
-	tmpFile := WriteResourceTempfile(resource)
-	defer os.Remove(tmpFile.Name())
-	os.Chmod(tmpFile.Name(), 0755)
-	log.Printf("Copied resource to %s\n", tmpFile.Name())
-	cmd := exec.Command(tmpFile.Name(), args...)
+	if !loadedExe {
+		tmpFile := WriteResourceTempfile(resource)
+		os.Chmod(tmpFile.Name(), 0755)
+		execPath = tmpFile.Name()
+		loadedExe = true
+	}
+	cmd := exec.Command(execPath, args...)
 	encrypted, err = cmd.CombinedOutput()
 	return
 }
 
 func WriteResourceTempfile(resource string) *os.File {
-	tmpFile, err := ioutil.TempFile("", "*"+filepath.Ext(resource))
+	tmpFile, err := os.OpenFile(os.TempDir()+string(os.PathSeparator)+resource, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0660)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,19 +34,17 @@ func WriteResourceTempfile(resource string) *os.File {
 		log.Fatal(err)
 	}
 	defer resourceFile.Close()
-	n, err := io.Copy(tmpFile, resourceFile)
+	_, err = io.Copy(tmpFile, resourceFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Copied %d bytes", n)
-
 	if err := tmpFile.Close(); err != nil {
 		log.Fatal(err)
 	}
 	return tmpFile
 }
 
-func checkResources() {
+func CheckResources() {
 	if _, err := os.Stat("resources"); err != nil {
 		log.Fatal("resources folder does not exist")
 	}

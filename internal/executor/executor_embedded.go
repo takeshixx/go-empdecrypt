@@ -3,16 +3,19 @@
 package executor
 
 import (
-	"fmt"
-
 	"github.com/takeshixx/go-empdecrypt/internal/embedded"
 )
+
+var loadedDLL bool
 
 func ExecuteEmpCrypt(plain string) (encrypted []byte, err error) {
 	return embedded.ExecResource("EmpCrypt.exe", []string{"/S", "/EIS", plain})
 }
 
 func InitExec(path string) {
-	fmt.Println("Writing DLL")
-	embedded.WriteResourceTempfile("Matrix42.Common.AppVerificator.dll")
+	embedded.CheckResources()
+	if !loadedDLL {
+		tmpFile := embedded.WriteResourceTempfile("Matrix42.Common.AppVerificator.dll")
+		loadedDLL = true
+	}
 }
