@@ -33,9 +33,9 @@ make dll
 
 Copy `EmpCrypt.exe` into the `bin/` directory.
 
-## Embedded Build with [pkger](https://github.com/markbates/pkger)
+## Embedded Build
 
-In order to create an embedded build, first create a `resources` folder and add copy the external dependencies:
+In order to create an embedded build, first create a `resources` folder and copy the external dependencies into that folder:
 
 ```bash
 mkdir resources
@@ -43,7 +43,7 @@ cp bin/Matrix42.Common.AppVerificator.dll resources
 cp EmpCrypt.exe resources
 ```
 
-Then run `pkger`:
+Then run [pkger](https://github.com/markbates/pkger):
 
 ```bash
 pkger
