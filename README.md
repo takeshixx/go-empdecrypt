@@ -25,14 +25,10 @@ Build the main binary:
 make
 ```
 
-Build the decoy lib:
+Build the decoy DLL:
 
 ```bash
-make lib
+make dll
 ```
 
 Copy `EmpCrypt.exe` into the `bin/` directory.
-
-## TODO
-
-* [ ] Implement adding dependencies as resources to the final binary
