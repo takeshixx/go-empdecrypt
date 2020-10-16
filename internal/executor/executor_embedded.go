@@ -15,7 +15,7 @@ func ExecuteEmpCrypt(plain string) (encrypted []byte, err error) {
 func InitExec(path string) {
 	embedded.CheckResources()
 	if !loadedDLL {
-		tmpFile := embedded.WriteResourceTempfile("Matrix42.Common.AppVerificator.dll")
+		embedded.WriteResourceTempfile("Matrix42.Common.AppVerificator.dll")
 		loadedDLL = true
 	}
 }
