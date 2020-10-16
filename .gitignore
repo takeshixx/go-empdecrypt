@@ -1,3 +1,6 @@
 bin/
 *.ini
 pkged.go
+resources/
+*.ddl
+*.exe
