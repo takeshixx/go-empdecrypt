@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -28,11 +29,13 @@ func IsValidEIS(hash string) bool {
 }
 
 func DecryptPassword(hash string) (password string) {
-	fmt.Printf("Processing hash: %s\n", hash)
+	if verbose {
+		fmt.Printf("Processing hash: %s\n", hash)
+	}
 	password = ""
 	var cur string
 	if hash == "A(,'-&-#+# /"+string('"')+"*&(',.+ )*/!$%-..,/!)*"+string('"')+")+$% X" {
-		return "PASSWORD IS EMPTY"
+		return "[PASSWORD IS EMPTY]"
 	}
 	for i := 1; 1 < 41; i++ {
 		for _, c := range ascii {
@@ -71,6 +74,30 @@ func ReadHashsFromFile(path string) (hashs []string, err error) {
 	for scanner.Scan() {
 		line = scanner.Text()
 		hashs = append(hashs, hashRegex.FindAllString(line, -1)...)
+	}
+	return
+}
+
+func ReadHashsFromPath(path string) (hashs []string, err error) {
+	if _, err = os.Stat(path); err != nil {
+		return
+	}
+	d, err := ioutil.ReadDir(path)
+	var newHashs []string
+	var fileName string
+	for _, o := range d {
+		if o.IsDir() {
+			continue
+		}
+		if strings.HasSuffix(o.Name(), ".ini") || strings.HasSuffix(o.Name(), ".INI") {
+			fileName = path + string(os.PathSeparator) + o.Name()
+			newHashs, err = ReadHashsFromFile(fileName)
+			if err != nil {
+				return
+			}
+			fmt.Printf("Found %d hashs in %s\n", len(newHashs), fileName)
+			hashs = append(hashs, newHashs...)
+		}
 	}
 	return
 }
@@ -116,17 +143,21 @@ func main() {
 	} else if *pathPtr {
 		// Read .ini files in a fiven path
 		// TODO: implement
+		hashs, err = ReadHashsFromPath(flag.Arg(0))
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else {
 		// Read input as a given encrypted password
 		hashs = append(hashs, flag.Arg(0))
 	}
 	hashs = UniqueHashs(hashs)
-	fmt.Printf("Processing %d hashs\n", len(hashs))
+	fmt.Printf("Processing %d unique hashs\n", len(hashs))
 	for _, h := range hashs {
 		if !IsValidEIS(h) {
 			log.Fatalf("Not a valid EIS hash: %s\n", h)
 		}
 		password := DecryptPassword(h)
-		fmt.Printf("%s:\t%s\n", h, password)
+		fmt.Printf("%s\t(%s)\n", password, h)
 	}
 }
