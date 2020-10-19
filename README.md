@@ -10,6 +10,28 @@ The reasons why it has been ported:
 
 This project requires the `EmpCrypt.exe` from Matrix42. Due to copyright issues this can't be included in this project.
 
+## Usage
+
+Provide hashs as position arguments (*Note*: hashs most likely contain single and double quotes):
+
+```powershell
+.\bin\empdecrypt A(,'-&-#+# /"*&(',.+ )*/!$%-..,/!)*")+$% X
+```
+
+When using the non-embedded binary or when `EmpDecrypt.exe` is not in the current path, provide the path with the `-c` flag:
+    
+```powershell
+.\bin\empdecrypt -c "..\..\EmpCrypt.exe"
+```
+
+Make sure the `Matrix42.Common.AppVerificator.dll` is in the same path as `EmpCrypt.exe`. Either use the original one or the decoy lib that has previously been built with `make dll`.
+
+In case many files have to be decrypted, it is recommended to use the following command:
+    
+```powershell
+.\bin\empdecrypt -p x:\path\to\ini\files\ | tee-object -filepath z:\output\path\passwords.txt
+```
+
 ## Building
 
 Install the building dependencies on Windows with [Chocolatey](https://chocolatey.org/):
